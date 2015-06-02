@@ -1,0 +1,17 @@
+{application, gold_fever_solver, [
+  {description, "inaka's gold_fever solver"},
+  {vsn, "0.0.1"},
+  {id, "gold_fever_solver"},
+  {registered, []},
+  {applications, [
+    kernel,
+    stdlib,
+    sasl,
+    lager,
+    katana
+  ]},
+  {modules, []},
+  {mod, {gold_fever_solver, []}},
+  {env, []},
+  {start_phases, []}
+ ]}.
