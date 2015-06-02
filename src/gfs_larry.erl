@@ -18,7 +18,7 @@ loop() ->
       K ! #{bad => map},
       K ! #{token => wrong},
       K ! #{token => T},
-      K ! #{token => T, gen_server => {larry, node()}};
+      K ! #{token => T, gen_server => {gfs_server, node()}};
     X -> lager:alert("Larry got ~p", [X])
   end,
   loop().

@@ -19,4 +19,7 @@ start_link() -> supervisor:start_link({local, ?MODULE}, ?MODULE, noargs).
 init(noargs) ->
   Larry =
     {larry, {gfs_larry, start_link, []}, permanent, 5000, worker, [gfs_larry]},
-  {ok, {{one_for_one, 5, 10}, [Larry]}}.
+  Server =
+    {server,
+      {gfs_server, start_link, []}, permanent, 5000, worker, [gfs_server]},
+  {ok, {{one_for_one, 5, 10}, [Larry, Server]}}.
