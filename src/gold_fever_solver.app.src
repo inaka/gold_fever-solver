@@ -7,10 +7,11 @@
     kernel,
     stdlib,
     sasl,
-    katana
+    katana,
+    cowboy
   ]},
   {modules, []},
   {mod, {gold_fever_solver, []}},
   {env, []},
-  {start_phases, []}
+  {start_phases, [{start_cowboy_listeners, []}]}
  ]}.

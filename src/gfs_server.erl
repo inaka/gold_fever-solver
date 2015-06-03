@@ -18,7 +18,7 @@ start_link() ->
   gen_server:start_link(
     {local, ?MODULE}, ?MODULE, noargs, [{debug, [trace, log]}]).
 
-token(Token) -> gen_server:cast(?MODULE, {token, Token}).
+token(Token) -> cast_real_kathy(?MODULE, {token, Token}).
 
 %% Callback implementation
 init(noargs) -> {ok, #state{}}.
@@ -54,6 +54,17 @@ handle_info({'EXIT',_, Reason}, State) ->
   call_real_kathy(RealKathy, #{}),
   call_real_kathy(RealKathy, #{token => wrong}),
   call_real_kathy(RealKathy, #{token => T}),
+  call_real_kathy(RealKathy, #{token => T}),
+  Self = self(),
+  spawn(fun() -> call_real_kathy(RealKathy, #{token => T}), Self ! done end),
+  receive done -> call_real_kathy(RealKathy, #{token => T}) end,
+  cast_real_kathy(RealKathy, notmap),
+  cast_real_kathy(RealKathy, #{}),
+  cast_real_kathy(RealKathy, #{token => wrong}),
+  cast_real_kathy(RealKathy, #{token => T}),
+  cast_real_kathy(RealKathy, #{token => T, address => "http://192.168.3.133:9876"}),
+
+  io:format("~n~n~n   D O N E ! ! !~n~n~n"),
   {noreply, State};
 handle_info(_Msg, State) -> {noreply, State}.
 
@@ -70,3 +81,7 @@ call_real_kathy(Kathy, Req) ->
   Resp = gen_server:call(Kathy, Req),
   io:format("Myself: ~p~nReal Kathy : ~p~n", [Req, Resp]),
   Resp.
+
+cast_real_kathy(Kathy, Msg) ->
+  io:format("Myself: ~p~n", [Msg]),
+  gen_server:cast(Kathy, Msg).
