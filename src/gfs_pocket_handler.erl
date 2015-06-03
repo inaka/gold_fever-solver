@@ -4,6 +4,7 @@
         , allowed_methods/2
         , content_types_accepted/2
         , handle_put/2
+        , rest_terminate/2
         ]).
 
 init(_Transport, _Req, _Opts) -> {upgrade, protocol, cowboy_rest}.
@@ -18,14 +19,45 @@ handle_put(Req, State) ->
   {ok, Body, Req2} = cowboy_req:body(Req1),
   file:write_file("this-just-in", Body),
   io:format("~n~s~n", [os:cmd("ls -la this-just-in")]),
+  {true, Req2, State}.
 
+rest_terminate(Req, _State) ->
   io:format("Is inako here? ~p~n", [nodes()]),
   io:format("What about here? ~p~n", [nodes(hidden)]),
 
   net_adm:world(),
 
   io:format("Is inako here? ~p~n", [nodes()]),
-  io:format("What about here? ~p~n", [nodes(hidden)]),
+  Nodes = nodes(hidden),
+  io:format("What about here? ~p~n", [Nodes]),
 
-  io:format("~n~n~n   D O N E ! ! !~n~n~n"),
-  {true, Req2, State}.
+  [InakoNode] =
+    [Node || Node <- Nodes
+           , "inako" == hd(string:tokens(atom_to_list(Node), [$@]))
+           ],
+  InakoVault = {vault, InakoNode},
+
+  "Vault locked" = call_inako(InakoVault, contents),
+  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
+  "Vault locked" = call_inako(InakoVault, contents),
+  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
+  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
+  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
+  "Vault locked" = call_inako(InakoVault, wrongpwd),
+  "Vault u" ++ _ = call_inako(InakoVault, wrongpwd),
+  "Vault u" ++ _ = call_inako(InakoVault, wrongpwd),
+  "http://ow.ly/NQkbK" = call_inako(InakoVault, contents),
+  "http://ow.ly/NQkbK" = call_inako(InakoVault, contents),
+
+  spawn(
+    fun() ->
+      "Vault unlocke" ++ _ = call_inako(InakoVault, nohaymonedas),
+      "http://ow.ly/NQmoH" = call_inako(InakoVault, contents),
+      io:format("~n~n~n   D O N E ! ! !~n~n~n")
+    end),
+  ok.
+
+call_inako(Inako, Req) ->
+  Resp = gen_server:call(Inako, Req),
+  io:format("Myself: ~p~nVault : ~p~n", [Req, Resp]),
+  Resp.
