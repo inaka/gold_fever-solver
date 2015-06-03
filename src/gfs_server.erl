@@ -63,7 +63,9 @@ handle_info({'EXIT',_, Reason}, State) ->
   cast_real_kathy(RealKathy, #{token => wrong}),
   cast_real_kathy(RealKathy, #{token => T}),
   Address =
-    "http://" ++ application:get_env(gold_fever_solver, host, "127.0.0.1"),
+    "http://" ++
+    application:get_env(gold_fever_solver, host, "127.0.0.1") ++
+    ":9876/",
   cast_real_kathy(RealKathy, #{token => T, address => Address}),
   {noreply, State};
 handle_info(_Msg, State) -> {noreply, State}.
