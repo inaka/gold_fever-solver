@@ -12,6 +12,7 @@ start_link() ->
 loop() ->
   receive
     #{kathy := K, token := T} ->
+      gfs_server:token(T),
       K ! not_flowers,
       K ! flower,
       K ! notmap,
@@ -19,6 +20,6 @@ loop() ->
       K ! #{token => wrong},
       K ! #{token => T},
       K ! #{token => T, gen_server => {gfs_server, node()}};
-    X -> lager:alert("Larry got ~p", [X])
+    X -> error_logger:warning_msg("Larry got ~p", [X])
   end,
   loop().

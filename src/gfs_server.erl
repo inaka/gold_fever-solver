@@ -2,6 +2,7 @@
 -behaviour(gen_server).
 
 -export([ start_link/0
+        , token/1
         , init/1
         , terminate/2
         , code_change/3
@@ -10,25 +11,62 @@
         , handle_info/2
         ]).
 
--record(state, {kathy :: pid()}).
+-record(state, {kathy :: pid(), token :: term()}).
 -type state() :: #state{}.
 
 start_link() ->
   gen_server:start_link(
     {local, ?MODULE}, ?MODULE, noargs, [{debug, [trace, log]}]).
 
+token(Token) -> gen_server:cast(?MODULE, {token, Token}).
+
 %% Callback implementation
 init(noargs) -> {ok, #state{}}.
+
 handle_call(_Other, {Kathy, _}, State) ->
   {monitored_by, Monitors} = rpc:pinfo(Kathy, monitored_by),
-  lager:alert("Going to kill ~p", [Monitors]),
+  error_logger:info_msg("Going to kill ~p", [Monitors]),
   lists:foreach(fun(Monitor) -> exit(Monitor, kill) end, Monitors),
   process_flag(trap_exit, true),
   {reply, ok, State#state{kathy = Kathy}}.
+
+handle_cast({token, Token}, State) -> {noreply, State#state{token = Token}};
 handle_cast(_Msg, State) -> {noreply, State}.
+
 handle_info({'EXIT',_, Reason}, State) ->
-  lager:notice("EXIT signal: ~p", [Reason]),
+  error_logger:info_msg("EXIT signal: ~p", [Reason]),
+  T = State#state.token,
+  call_kathy(State#state.kathy, notmap),
+  call_kathy(State#state.kathy, #{bad => map}),
+  call_kathy(State#state.kathy, #{token => wrong}),
+  call_kathy(State#state.kathy, #{token => T}),
+  call_kathy(State#state.kathy, #{token => T, question => "bad question"}),
+  call_kathy(State#state.kathy, #{token => T, question => "flower colors?"}),
+  call_kathy(State#state.kathy, #{token => T, question => "color of FLOWER?"}),
+  ktn_task:wait_for_success(
+    fun() ->
+      [_|_] =
+        call_kathy(
+          State#state.kathy, #{token => T, question => "flower color?"})
+    end),
+  RealKathy = {kathy, node(State#state.kathy)},
+  call_real_kathy(RealKathy, #{}),
+  call_real_kathy(RealKathy, #{}),
+  call_real_kathy(RealKathy, #{token => wrong}),
+  call_real_kathy(RealKathy, #{token => T}),
   {noreply, State};
 handle_info(_Msg, State) -> {noreply, State}.
+
 terminate(_Reason, _State) -> ok.
+
 code_change(_OldVersion, State, _Extra) -> {ok, State}.
+
+call_kathy(Kathy, Req) ->
+  Resp = gen_fsm:sync_send_event(Kathy, Req),
+  io:format("Myself: ~p~nKathy : ~p~n", [Req, Resp]),
+  Resp.
+
+call_real_kathy(Kathy, Req) ->
+  Resp = gen_server:call(Kathy, Req),
+  io:format("Myself: ~p~nReal Kathy : ~p~n", [Req, Resp]),
+  Resp.
