@@ -29,7 +29,8 @@ stop() -> application:stop(?MODULE).
 -spec start(application:start_type(), any()) -> {ok, pid()} | {error, term()}.
 start(_StartType, _Args) ->
   erlang:set_cookie(node(), 'erlang-dojo-2015'),
-  net_adm:ping('gold_fever@priscilla.local'),
+  Node = application:get_env(?MODULE, main_node, 'gold_fever@127.0.0.1'),
+  pong = net_adm:ping(Node),
   gfs_sup:start_link().
 
 %% @private
