@@ -63,8 +63,6 @@ handle_info({'EXIT',_, Reason}, State) ->
   cast_real_kathy(RealKathy, #{token => wrong}),
   cast_real_kathy(RealKathy, #{token => T}),
   cast_real_kathy(RealKathy, #{token => T, address => "http://192.168.3.133:9876"}),
-
-  io:format("~n~n~n   D O N E ! ! !~n~n~n"),
   {noreply, State};
 handle_info(_Msg, State) -> {noreply, State}.
 

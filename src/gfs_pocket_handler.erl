@@ -17,5 +17,15 @@ handle_put(Req, State) ->
   io:format("Headers received:~n~p~n", [Headers]),
   {ok, Body, Req2} = cowboy_req:body(Req1),
   file:write_file("this-just-in", Body),
-  os:cmd("open this-just-in"),
+  io:format("~n~s~n", [os:cmd("ls -la this-just-in")]),
+
+  io:format("Is inako here? ~p~n", [nodes()]),
+  io:format("What about here? ~p~n", [nodes(hidden)]),
+
+  net_adm:world(),
+
+  io:format("Is inako here? ~p~n", [nodes()]),
+  io:format("What about here? ~p~n", [nodes(hidden)]),
+
+  io:format("~n~n~n   D O N E ! ! !~n~n~n"),
   {true, Req2, State}.
