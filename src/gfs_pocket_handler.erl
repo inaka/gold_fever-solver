@@ -44,8 +44,8 @@ rest_terminate(Req, _State) ->
   <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
   <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
   "Vault locked" = call_inako(InakoVault, wrongpwd),
-  "Vault u" ++ _ = call_inako(InakoVault, wrongpwd),
-  "Vault u" ++ _ = call_inako(InakoVault, wrongpwd),
+  "Vault unlocke" ++ _ = call_inako(InakoVault, wrongpwd),
+  "Vault unlocke" ++ _ = call_inako(InakoVault, wrongpwd),
   "http://ow.ly/NQkbK" = call_inako(InakoVault, contents),
   "http://ow.ly/NQkbK" = call_inako(InakoVault, contents),
 
