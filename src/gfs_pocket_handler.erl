@@ -22,42 +22,42 @@ handle_put(Req, State) ->
   {true, Req2, State}.
 
 rest_terminate(Req, _State) ->
-  io:format("Is inako here? ~p~n", [nodes()]),
+  io:format("Is joe here? ~p~n", [nodes()]),
   io:format("What about here? ~p~n", [nodes(hidden)]),
 
   net_adm:world(),
 
-  io:format("Is inako here? ~p~n", [nodes()]),
+  io:format("Is joe here? ~p~n", [nodes()]),
   Nodes = nodes(hidden),
   io:format("What about here? ~p~n", [Nodes]),
 
-  [InakoNode] =
+  [JoenoDe] =
     [Node || Node <- Nodes
-           , "inako" == hd(string:tokens(atom_to_list(Node), [$@]))
+           , "joe" == hd(string:tokens(atom_to_list(Node), [$@]))
            ],
-  InakoVault = {vault, InakoNode},
+  JoevaUlt = {vault, JoenoDe},
 
-  "Vault locked" = call_inako(InakoVault, contents),
-  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
-  "Vault locked" = call_inako(InakoVault, contents),
-  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
-  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
-  <<"Wrong p", _/binary>> = call_inako(InakoVault, wrongpwd),
-  "Vault locked" = call_inako(InakoVault, wrongpwd),
-  "Vault unlocke" ++ _ = call_inako(InakoVault, wrongpwd),
-  "Vault unlocke" ++ _ = call_inako(InakoVault, wrongpwd),
-  "http://ow.ly/NQkbK" = call_inako(InakoVault, contents),
-  "http://ow.ly/NQkbK" = call_inako(InakoVault, contents),
+  "Vault locked" ++ _ = call_joe(JoevaUlt, contents),
+  <<"Wrong k", _/binary>> = call_joe(JoevaUlt, wrongpwd),
+  "Vault locked" ++ _ = call_joe(JoevaUlt, contents),
+  <<"Wrong k", _/binary>> = call_joe(JoevaUlt, wrongpwd),
+  <<"Wrong k", _/binary>> = call_joe(JoevaUlt, wrongpwd),
+  <<"Wrong k", _/binary>> = call_joe(JoevaUlt, wrongpwd),
+  "Vault locked" ++ _ = call_joe(JoevaUlt, wrongpwd),
+  "Vault unlocke" ++ _ = call_joe(JoevaUlt, wrongpwd),
+  "Vault unlocke" ++ _ = call_joe(JoevaUlt, wrongpwd),
+  "http://ow.ly/NQkbK" = call_joe(JoevaUlt, contents),
+  "http://ow.ly/NQkbK" = call_joe(JoevaUlt, contents),
 
   spawn(
     fun() ->
-      "Vault unlocke" ++ _ = call_inako(InakoVault, nohaymonedas),
-      "http://ow.ly/NQmoH" = call_inako(InakoVault, contents),
+      "Vault unlocke" ++ _ = call_joe(JoevaUlt, letitcrash),
+      "http://ow.ly/NQmoH" = call_joe(JoevaUlt, contents),
       io:format("~n~n~n   D O N E ! ! !~n~n~n")
     end),
   ok.
 
-call_inako(Inako, Req) ->
+call_joe(Inako, Req) ->
   Resp = gen_server:call(Inako, Req),
   io:format("Myself: ~p~nVault : ~p~n", [Req, Resp]),
   Resp.
