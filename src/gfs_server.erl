@@ -12,7 +12,6 @@
         ]).
 
 -record(state, {kathy :: pid(), token :: term()}).
--type state() :: #state{}.
 
 start_link() ->
   gen_server:start_link(
@@ -58,15 +57,11 @@ handle_info({'EXIT',_, Reason}, State) ->
   Self = self(),
   spawn(fun() -> call_real_kathy(RealKathy, #{token => T}), Self ! done end),
   receive done -> call_real_kathy(RealKathy, #{token => T}) end,
-  cast_real_kathy(RealKathy, notmap),
-  cast_real_kathy(RealKathy, #{}),
-  cast_real_kathy(RealKathy, #{token => wrong}),
-  cast_real_kathy(RealKathy, #{token => T}),
-  Address =
-    "http://" ++
-    application:get_env(gold_fever_solver, host, "127.0.0.1") ++
-    ":9876/",
-  cast_real_kathy(RealKathy, #{token => T, address => Address}),
+  {noreply, State};
+handle_info(Img, State) when is_binary(Img) ->
+  file:write_file("priv/img.png", Img),
+  os:cmd("open priv/img.png"),
+  gfs_joe:find(),
   {noreply, State};
 handle_info(_Msg, State) -> {noreply, State}.
 

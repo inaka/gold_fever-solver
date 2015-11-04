@@ -4,15 +4,12 @@ CONFIG ?= test/test.config
 
 RELX_URL := https://github.com/erlware/relx/releases/download/v2.0.0/relx
 
-DEPS = eper mixer lager cowboy jiffy katana
+DEPS = eper lager katana
 SELL_DEPS = sync
 TEST_DEPS = xref_runner
 
 dep_katana = git https://github.com/inaka/erlang-katana.git 0.2.5
-dep_cowboy = git https://github.com/extend/cowboy.git 1.0.1
-dep_jiffy = git https://github.com/davisp/jiffy.git 0.13.3
 dep_eper = git https://github.com/massemanet/eper.git 0.90.0
-dep_mixer = git https://github.com/inaka/mixer.git 0.1.2
 dep_sync = git https://github.com/inaka/sync.git 0.1
 dep_xref_runner = git https://github.com/inaka/xref_runner.git 0.2.2
 

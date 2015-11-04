@@ -7,7 +7,6 @@
 -export([ start/0
         , stop/0
         , start/2
-        , start_phase/3
         , stop/1
         ]).
 
@@ -28,22 +27,10 @@ stop() -> application:stop(?MODULE).
 %% @private
 -spec start(application:start_type(), any()) -> {ok, pid()} | {error, term()}.
 start(_StartType, _Args) ->
-  erlang:set_cookie(node(), 'erlang-dojo-2015'),
+  erlang:set_cookie(node(), 'utn-frba'),
   Node = application:get_env(?MODULE, main_node, 'gold_fever@127.0.0.1'),
   pong = net_adm:ping(Node),
   gfs_sup:start_link().
-
-%% @private
--spec start_phase(atom(), application:start_type(), []) -> ok | {error, _}.
-start_phase(start_cowboy_listeners, _StartType, []) ->
-  Routes = [{'_', [{"/pocket", gfs_pocket_handler, []}]}],
-  Dispatch = cowboy_router:compile(Routes),
-  case cowboy:start_http(
-        gfs_http_listener, 10, [{port, 9876}],
-        [{env, [{dispatch, Dispatch}]}]) of
-    {ok, _} -> ok;
-    {error, {already_started, _}} -> ok
-  end.
 
 %% @private
 -spec stop([]) -> ok.
